@@ -11,7 +11,7 @@ The worker requires the following environment variables to be set:
 
 ## Install
 
-You can download `oc-worker` from [Releases](https://github.com/ilyhalight/toiloff-workers/releases).
+You can download `oc-worker` for linux from [Releases](https://github.com/ilyhalight/toiloff-workers/releases).
 
 ## Build
 
