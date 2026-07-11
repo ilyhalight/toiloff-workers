@@ -70,78 +70,80 @@ jobs:
           path: workers/${{ env.BIN_NAME }}/dist/${{ matrix.archive_name }}
           if-no-files-found: error
 
-  build-macos:
-    name: Build oc-worker for macOS (${{ matrix.target }})
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          - x86_64-apple-darwin
-          - aarch64-apple-darwin
-    defaults:
-      run:
-        working-directory: ./workers/oc-worker
-    steps:
-      - name: Checkout Actions Repository
-        uses: actions/checkout@v7
+  # build-macos:
+  #   name: Build oc-worker for macOS (${{ matrix.target }})
+  #   runs-on: macos-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       target:
+  #         - x86_64-apple-darwin
+  #         - aarch64-apple-darwin
+  #   defaults:
+  #     run:
+  #       working-directory: ./workers/oc-worker
+  #   steps:
+  #     - name: Checkout Actions Repository
+  #       uses: actions/checkout@v7
 
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
+  #     - name: Setup Rust toolchain
+  #       uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         targets: ${{ matrix.target }}
 
-      - name: Build binary
-        run: cargo build --release --locked --target ${{ matrix.target }}
+  #     - name: Build binary
+  #       run: cargo build --release --locked --target ${{ matrix.target }}
 
-      - name: Package archive
-        run: |
-          mkdir -p dist
-          cp "target/${{ matrix.target }}/release/${BIN_NAME}" "dist/${BIN_NAME}"
-          tar -C dist -czf "dist/${BIN_NAME}-${{ matrix.target }}.tar.gz" "${BIN_NAME}"
+  #     - name: Package archive
+  #       run: |
+  #         mkdir -p dist
+  #         cp "target/${{ matrix.target }}/release/${BIN_NAME}" "dist/${BIN_NAME}"
+  #         tar -C dist -czf "dist/${BIN_NAME}-${{ matrix.target }}.tar.gz" "${BIN_NAME}"
 
-      - name: Upload release artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.BIN_NAME }}-${{ matrix.target }}
-          path: workers/${{ env.BIN_NAME }}/dist/${{ env.BIN_NAME }}-${{ matrix.target }}.tar.gz
-          if-no-files-found: error
+  #     - name: Upload release artifact
+  #       uses: actions/upload-artifact@v7
+  #       with:
+  #         name: ${{ env.BIN_NAME }}-${{ matrix.target }}
+  #         path: workers/${{ env.BIN_NAME }}/dist/${{ env.BIN_NAME }}-${{ matrix.target }}.tar.gz
+  #         if-no-files-found: error
 
-  build-windows:
-    name: Build oc-worker for Windows
-    runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: ./workers/oc-worker
-    steps:
-      - name: Checkout Actions Repository
-        uses: actions/checkout@v7
+  # build-windows:
+  #   name: Build oc-worker for Windows
+  #   runs-on: windows-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./workers/oc-worker
+  #   steps:
+  #     - name: Checkout Actions Repository
+  #       uses: actions/checkout@v7
 
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-pc-windows-msvc
+  #     - name: Setup Rust toolchain
+  #       uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         targets: x86_64-pc-windows-msvc
 
-      - name: Build binary
-        run: cargo build --release --locked --target x86_64-pc-windows-msvc
+  #     - name: Build binary
+  #       run: cargo build --release --locked --target x86_64-pc-windows-msvc
 
-      - name: Package archive
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Copy-Item "target/x86_64-pc-windows-msvc/release/${{ env.BIN_NAME }}.exe" "dist/${{ env.BIN_NAME }}.exe"
-          Compress-Archive -Path "dist/${{ env.BIN_NAME }}.exe" -DestinationPath "dist/${{ env.BIN_NAME }}-x86_64-pc-windows-msvc.zip" -Force
+  #     - name: Package archive
+  #       shell: pwsh
+  #       run: |
+  #         New-Item -ItemType Directory -Force -Path dist | Out-Null
+  #         Copy-Item "target/x86_64-pc-windows-msvc/release/${{ env.BIN_NAME }}.exe" "dist/${{ env.BIN_NAME }}.exe"
+  #         Compress-Archive -Path "dist/${{ env.BIN_NAME }}.exe" -DestinationPath "dist/${{ env.BIN_NAME }}-x86_64-pc-windows-msvc.zip" -Force
 
-      - name: Upload release artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.BIN_NAME }}-x86_64-pc-windows-msvc
-          path: workers/${{ env.BIN_NAME }}/dist/${{ env.BIN_NAME }}-x86_64-pc-windows-msvc.zip
-          if-no-files-found: error
+  #     - name: Upload release artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ env.BIN_NAME }}-x86_64-pc-windows-msvc
+  #         path: workers/${{ env.BIN_NAME }}/dist/${{ env.BIN_NAME }}-x86_64-pc-windows-msvc.zip
+  #         if-no-files-found: error
 
   release:
     name: Create GitHub release
-    needs: [build-linux, build-macos, build-windows]
+    # needs: [build-linux, build-macos, build-windows]
+    # ! sorry it's so expensive
+    needs: [build-linux]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
@@ -152,7 +154,7 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           tag_name: ${{ github.ref }}
           name: ${{ github.sha }}
           draft: true
