@@ -3,9 +3,17 @@ name: CI
 
 on:
   pull_request:
+    paths:
+      - "workers/oc-worker/**"
+      - "!workers/oc-worker/**.md"
+      - ".github/workflows/oc-worker-ci.yml"
   push:
     branches:
       - master
+    paths:
+      - "workers/oc-worker/**"
+      - "!workers/oc-worker/**.md"
+      - ".github/workflows/oc-worker-ci.yml"
   workflow_call:
 
 env:
@@ -130,3 +138,24 @@ jobs:
           name: ${{ env.BIN_NAME }}-x86_64-pc-windows-msvc
           path: workers/${{ env.BIN_NAME }}/dist/${{ env.BIN_NAME }}-x86_64-pc-windows-msvc.zip
           if-no-files-found: error
+
+  release:
+    name: Create GitHub release
+    needs: [build-linux, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref }}
+          name: ${{ github.sha }}
+          draft: true
+          prerelease: false
+          files: dist/*
+          fail_on_unmatched_files: true
