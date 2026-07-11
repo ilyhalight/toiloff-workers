@@ -7,7 +7,7 @@ Client-side (local machine) worker that collects sessions usage stats from OpenC
 The worker requires the following environment variables to be set:
 
 - `API_BASE_URL` - The base URL of the backend API (e.g., `http://localhost:3001`)
-- `API_SERVICE_SECRET` - The secret key for authenticating with the backend API
+- `API_SERVICE_TOKEN` - The secret service token for authenticating with the backend API
 
 ## Install
 

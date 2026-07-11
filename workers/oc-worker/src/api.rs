@@ -28,6 +28,18 @@ pub struct APISessionResponse {
     pub count: i32,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct APIErrorResponse {
+    pub error: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum SessionResponse {
+    Failed(APIErrorResponse),
+    Valid(APISessionResponse),
+}
+
 pub fn convert_unix_to_iso(timestamp: i64) -> Option<String> {
     let datetime = chrono::DateTime::from_timestamp(timestamp / 1000, 0);
     match datetime {
@@ -69,21 +81,21 @@ pub fn get_base_url() -> String {
     base_url
 }
 
-pub fn get_service_secret() -> String {
-    let service_key = std::env::var("API_SERVICE_SECRET")
-        .expect("Please provide API_SERVICE_SECRET environment variable");
+pub fn get_service_token() -> String {
+    let service_key = std::env::var("API_SERVICE_TOKEN")
+        .expect("Please provide API_SERVICE_TOKEN environment variable");
     service_key
 }
 
 pub async fn push_session_data(
     api_sessions: Vec<APISession>,
-) -> Result<APISessionResponse, reqwest::Error> {
+) -> Result<SessionResponse, reqwest::Error> {
     Client::new()
         .post(&format!("{}/v1/stats/upsert", get_base_url()))
-        .header("X-Service-Secret", get_service_secret())
+        .header("x-service-token", get_service_token())
         .json(&api_sessions)
         .send()
         .await?
-        .json::<APISessionResponse>()
+        .json::<SessionResponse>()
         .await
 }
