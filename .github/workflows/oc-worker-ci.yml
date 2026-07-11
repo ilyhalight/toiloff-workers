@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - master
+  workflow_call:
 
 env:
   BIN_NAME: oc-worker
@@ -35,9 +36,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Setup Zig
-        uses: goto-bus-stop/setup-zig@v2
+        uses: mlugg/setup-zig@v2
         with:
-          version: 0.17.0
+          version: 0.16.0
 
       - name: Install cargo-zigbuild
         run: cargo install --locked cargo-zigbuild
@@ -68,6 +69,9 @@ jobs:
         target:
           - x86_64-apple-darwin
           - aarch64-apple-darwin
+    defaults:
+      run:
+        working-directory: ./workers/oc-worker
     steps:
       - name: Checkout Actions Repository
         uses: actions/checkout@v7
