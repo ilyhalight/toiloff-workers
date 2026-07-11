@@ -34,6 +34,8 @@ jobs:
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
 
       - name: Setup Zig
         uses: mlugg/setup-zig@v2
@@ -57,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
-          path: dist/${{ matrix.archive_name }}
+          path: workers/${{ env.BIN_NAME }}/dist/${{ matrix.archive_name }}
           if-no-files-found: error
 
   build-macos:
@@ -93,8 +95,8 @@ jobs:
       - name: Upload release artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${BIN_NAME}-${{ matrix.target }}
-          path: dist/${BIN_NAME}-${{ matrix.target }}.tar.gz
+          name: ${{ env.BIN_NAME }}-${{ matrix.target }}
+          path: workers/${{ env.BIN_NAME }}/dist/${{ env.BIN_NAME }}-${{ matrix.target }}.tar.gz
           if-no-files-found: error
 
   build-windows:
@@ -119,12 +121,12 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Copy-Item "target/x86_64-pc-windows-msvc/release/${env:BIN_NAME}.exe" "dist/${env:BIN_NAME}.exe"
-          Compress-Archive -Path "dist/${env:BIN_NAME}.exe" -DestinationPath "dist/${env:BIN_NAME}-x86_64-pc-windows-msvc.zip" -Force
+          Copy-Item "target/x86_64-pc-windows-msvc/release/${{ env.BIN_NAME }}.exe" "dist/${{ env.BIN_NAME }}.exe"
+          Compress-Archive -Path "dist/${{ env.BIN_NAME }}.exe" -DestinationPath "dist/${{ env.BIN_NAME }}-x86_64-pc-windows-msvc.zip" -Force
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${env:BIN_NAME}-x86_64-pc-windows-msvc
-          path: dist/${env:BIN_NAME}-x86_64-pc-windows-msvc.zip
+          name: ${{ env.BIN_NAME }}-x86_64-pc-windows-msvc
+          path: workers/${{ env.BIN_NAME }}/dist/${{ env.BIN_NAME }}-x86_64-pc-windows-msvc.zip
           if-no-files-found: error
