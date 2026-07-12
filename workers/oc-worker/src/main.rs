@@ -1,5 +1,5 @@
-mod api;
 mod cache;
+mod internal_api;
 
 use dotenvy::dotenv;
 use oc_collect::CollectClient;
@@ -20,19 +20,19 @@ async fn main() -> anyhow::Result<()> {
 
     let latest_session = sessions.iter().max_by_key(|data| data.session.time_updated);
     sheen::info!("Trying to send sessions to API...", count = sessions.len(),);
-    let api_sessions = api::convert_to_api_session(&sessions);
-    let response = api::push_session_data(api_sessions).await;
+    let api_sessions = internal_api::convert_to_api_session(&sessions);
+    let response = internal_api::push_session_data(api_sessions).await;
     if !response.is_ok() {
-        sheen::error!("Failed to push session data!");
+        sheen::error!("Failed to push session data!", err = response.err());
         anyhow::bail!("read upper ^")
     }
 
     let response_data = match response.unwrap() {
-        api::SessionResponse::Failed(err) => {
+        internal_api::SessionResponse::Failed(err) => {
             sheen::error!(&err.error);
             anyhow::bail!("read upper ^")
-        },
-        api::SessionResponse::Valid(data) => data,
+        }
+        internal_api::SessionResponse::Valid(data) => data,
     };
 
     sheen::info!("Pushed sessions to API!", count = response_data.count);

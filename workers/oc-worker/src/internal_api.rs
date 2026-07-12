@@ -1,6 +1,25 @@
+use std::sync::LazyLock;
+
 use oc_collect::UsageSessionData;
-use reqwest::Client;
+use reqwest::{
+    Client,
+    header::{HeaderMap, HeaderValue},
+};
 use serde::{Deserialize, Serialize};
+
+static API_BASE_URL: LazyLock<String> = LazyLock::new(|| {
+    std::env::var("API_BASE_URL").unwrap_or_else(|_| "http://localhost:3001".to_string())
+});
+static API_SERVICE_TOKEN: LazyLock<String> = LazyLock::new(|| {
+    let service_token = std::env::var("API_SERVICE_TOKEN");
+    match service_token {
+        Ok(val) => val,
+        Err(_) => {
+            sheen::error!("Please provide API_SERVICE_TOKEN environment variable");
+            panic!("read upper ^")
+        }
+    }
+});
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct APISession {
@@ -75,24 +94,22 @@ pub fn convert_to_api_session(session_data: &Vec<UsageSessionData>) -> Vec<APISe
         .collect()
 }
 
-pub fn get_base_url() -> String {
-    let base_url =
-        std::env::var("API_BASE_URL").unwrap_or_else(|_| "http://localhost:3001".to_string());
-    base_url
-}
-
-pub fn get_service_token() -> String {
-    let service_key = std::env::var("API_SERVICE_TOKEN")
-        .expect("Please provide API_SERVICE_TOKEN environment variable");
-    service_key
+pub fn get_headers() -> HeaderMap {
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        "x-service-token",
+        HeaderValue::from_str(&API_SERVICE_TOKEN).unwrap(),
+    );
+    headers
 }
 
 pub async fn push_session_data(
     api_sessions: Vec<APISession>,
 ) -> Result<SessionResponse, reqwest::Error> {
+    let headers = get_headers();
     Client::new()
-        .post(&format!("{}/v1/stats/upsert", get_base_url()))
-        .header("x-service-token", get_service_token())
+        .post(&format!("{}/v1/stats/upsert", API_BASE_URL.to_string()))
+        .headers(headers)
         .json(&api_sessions)
         .send()
         .await?

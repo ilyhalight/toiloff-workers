@@ -1,8 +1,8 @@
-use std::{str::FromStr, sync::LazyLock};
+use std::sync::LazyLock;
 
 use reqwest::{
     Client,
-    header::{HeaderMap, HeaderName, HeaderValue},
+    header::{HeaderMap, HeaderValue},
 };
 use serde::{Deserialize, Serialize};
 
@@ -41,7 +41,7 @@ pub enum SnapshotResponse {
 pub fn get_headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
     headers.insert(
-        HeaderName::from_str("x-service-token").unwrap(),
+        "x-service-token",
         HeaderValue::from_str(&API_SERVICE_TOKEN).unwrap(),
     );
     headers
