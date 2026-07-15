@@ -21,29 +21,25 @@ static GH_CLASSIC_TOKEN: LazyLock<String> = LazyLock::new(|| {
 });
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ContributionsCollection {
-    #[serde(rename = "totalCommitContributions")]
     total_commit_contributions: u32,
-    #[serde(rename = "contributionYears")]
     contribution_years: Vec<u16>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ViewerWithContribs {
     pub login: String,
-    #[serde(rename = "contributionsCollection")]
     pub contributions_collection: ContributionsCollection,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PageInfo {
-    #[serde(rename = "endCursor")]
     pub end_cursor: Option<String>,
-    #[serde(rename = "startCursor")]
     pub start_cursor: Option<String>,
-    #[serde(rename = "hasNextPage")]
     pub has_next_page: bool,
-    #[serde(rename = "hasPreviousPage")]
     pub has_previous_page: bool,
 }
 
@@ -53,17 +49,17 @@ pub struct RepositoryOwner {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RepositoryNode {
     pub name: String,
-    #[serde(rename = "stargazerCount")]
     pub stargazer_count: u32,
     pub owner: RepositoryOwner,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Repositories {
     pub nodes: Vec<RepositoryNode>,
-    #[serde(rename = "pageInfo")]
     pub page_info: PageInfo,
 }
 

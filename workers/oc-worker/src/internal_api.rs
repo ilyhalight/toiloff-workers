@@ -22,23 +22,17 @@ static API_SERVICE_TOKEN: LazyLock<String> = LazyLock::new(|| {
 });
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct APISession {
     pub id: String,
     pub title: String,
-    #[serde(rename = "tokensInput")]
     pub tokens_input: String,
-    #[serde(rename = "tokensOutput")]
     pub tokens_output: String,
-    #[serde(rename = "tokensCacheRead")]
     pub tokens_cache_read: String,
     pub model: String,
-    #[serde(rename = "modelProvider")]
     pub model_provider: String,
-    #[serde(rename = "modelVariant")]
     pub model_variant: Option<String>,
-    #[serde(rename = "createdAt")]
     pub created_at: Option<String>,
-    #[serde(rename = "updatedAt")]
     pub updated_at: Option<String>,
 }
 
