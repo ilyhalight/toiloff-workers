@@ -67,12 +67,15 @@ pub fn convert_unix_to_iso(timestamp: i64) -> Option<String> {
 pub fn convert_to_api_session(session_data: &Vec<UsageSessionData>) -> Vec<APISession> {
     session_data
         .iter()
-        .map(|session_item| -> APISession {
+        .filter_map(|session_item| -> Option<APISession> {
             let UsageSessionData { session, model } = session_item;
+            if session.model.is_empty() || session.title.is_empty() {
+                return None;
+            }
             let created_at = convert_unix_to_iso(session.time_created);
             let updated_at = convert_unix_to_iso(session.time_updated);
 
-            APISession {
+            Some(APISession {
                 id: session.id.clone(),
                 title: session.title.clone(),
                 tokens_input: session.tokens_input.to_string(),
@@ -83,7 +86,7 @@ pub fn convert_to_api_session(session_data: &Vec<UsageSessionData>) -> Vec<APISe
                 model_variant: model.variant.clone(),
                 created_at,
                 updated_at,
-            }
+            })
         })
         .collect()
 }

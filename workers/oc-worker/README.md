@@ -1,6 +1,6 @@
 # oc-worker
 
-Client-side (local machine) worker that collects sessions usage stats from OpenCode and sends them to [backend](https://github.com/ilyhalight/toiloff-backend).
+Client-side (local machine) worker that collects sessions usage stats from OpenCode v2 and sends them to [backend](https://github.com/ilyhalight/toiloff-backend).
 
 ## Configuration
 

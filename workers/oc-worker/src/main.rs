@@ -18,7 +18,9 @@ async fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let latest_session = sessions.iter().max_by_key(|data| data.session.time_updated);
+    let latest_session: Option<&oc_collect::UsageSessionData> = sessions
+        .iter()
+        .max_by_key(|data: &&oc_collect::UsageSessionData| data.session.time_updated);
     sheen::info!("Trying to send sessions to API...", count = sessions.len(),);
     let api_sessions = internal_api::convert_to_api_session(&sessions);
     let response = internal_api::push_session_data(api_sessions).await;
