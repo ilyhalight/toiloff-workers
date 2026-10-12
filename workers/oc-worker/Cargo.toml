@@ -1,15 +1,15 @@
 [package]
 name = "oc-worker"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2024"
 
 [dependencies]
-tokio = { version = "1.53.1", features = ["full"] }
+tokio = { version = "1.53.2", features = ["full"] }
 anyhow = "1.0.104"
-oc-collect = "0.2.0"
+oc-collect = "0.2.1"
 sheen = "0.3"
 reqwest = { version = "0.13.5", features = ["json"] }
 serde = { version = "1.0.229", features = ["derive"] }
-chrono = "0.4"
-serde_json = "1.0.151"
+chrono = "0.4.45"
+serde_json = "1.0.154"
 dotenvy = "0.15.7"
